@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Kantin HSI-BS</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">🏪</div>
+        <div>
+          <h2>Kantin HSI-BS</h2>
+          <p>HSI Boarding School</p>
+        </div>
+      </div>
+
+      <div class="menu-label">MENU</div>
+      <nav class="menu">
+        <a href="#" class="menu-item active" data-page="dashboard">📊 Dashboard</a>
+        <a href="#" class="menu-item" data-page="produk">📦 Produk</a>
+        <a href="#" class="menu-item" data-page="laporan">📄 Laporan</a>
+        <a href="#" class="menu-item" data-page="pengaturan">⚙️ Pengaturan</a>
+      </nav>
+
+      <button id="toggle-dark" class="dark-mode-btn">🌙 Mode gelap</button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- ==================== HALAMAN 1: DASHBOARD ==================== -->
+      <div id="page-dashboard" class="page-section active">
+        <header class="top-header">
+          <div>
+            <span class="breadcrumb">Kantin HSI-BS / Dashboard</span>
+            <h1>Dashboard Kantin</h1>
+            <p class="subtitle">17 Okt – 23 Okt • 3 kategori • 10 produk</p>
+          </div>
+
+          <div class="filters">
+            <div class="filter-group">
+              <label>Tanggal</label>
+              <div class="date-box">📅 17 Okt 2026 – 23 Okt 2026</div>
+            </div>
+
+            <div class="filter-group">
+              <label>Kategori</label>
+              <div class="tag-container" id="category-tags">
+                <span class="tag" data-cat="MAKANAN">Makanan <button onclick="toggleCategory('MAKANAN')">×</button></span>
+                <span class="tag" data-cat="MINUMAN">Minuman <button onclick="toggleCategory('MINUMAN')">×</button></span>
+                <span class="tag" data-cat="SNACK">Snack <button onclick="toggleCategory('SNACK')">×</button></span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- 3 KPI Cards -->
+        <section class="kpi-grid">
+          <div class="card kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title"><i class="badge-icon blue">💳</i> Omzet</span>
+              <span class="info-icon">ⓘ</span>
+            </div>
+            <div class="kpi-value" id="kpi-omzet">Rp1.410.000</div>
+            <div class="kpi-sub" id="kpi-avg">Rata-rata Rp201.429 per hari</div>
+          </div>
+
+          <div class="card kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title"><i class="badge-icon green">🛍️</i> Item terjual</span>
+              <span class="info-icon">ⓘ</span>
+            </div>
+            <div class="kpi-value" id="kpi-items">261</div>
+            <div class="kpi-sub" id="kpi-prod-count">Dari 10 produk yang laku</div>
+          </div>
+
+          <div class="card kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-title"><i class="badge-icon purple">🧾</i> Transaksi</span>
+              <span class="info-icon">ⓘ</span>
+            </div>
+            <div class="kpi-value">21</div>
+            <div class="kpi-sub">Dalam 7 hari</div>
+          </div>
+        </section>
+
+        <!-- Charts Row -->
+        <section class="charts-grid">
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3>Omzet per hari</h3>
+              <span class="unit">Rupiah</span>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="barChart"></canvas>
+            </div>
+          </div>
+
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3>Item per kategori</h3>
+              <span class="unit">Porsi</span>
+            </div>
+            <div class="chart-wrapper donut-wrapper">
+              <canvas id="donutChart"></canvas>
+            </div>
+            <div class="custom-legend">
+              <span><i class="dot blue"></i> Makanan</span>
+              <span><i class="dot green"></i> Minuman</span>
+              <span><i class="dot purple"></i> Snack</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Bottom Row: Table & Promo -->
+        <section class="bottom-grid">
+          <div class="card table-card">
+            <div class="card-header">
+              <h3>Produk</h3>
+              <span class="unit" id="table-count">10 produk</span>
+            </div>
+
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>
+                      Produk
+                      <input type="text" id="search-product" placeholder="Cari produk..." />
+                    </th>
+                    <th>Kategori</th>
+                    <th class="sortable" onclick="sortTable('sold')">Terjual ↕</th>
+                    <th class="sortable" onclick="sortTable('revenue')">Omzet ↕</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="product-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card promo-card">
+            <div class="card-header">
+              <h3>Promo minggu ini</h3>
+              <span class="unit">4 aktif</span>
+            </div>
+
+            <div class="promo-list">
+              <div class="promo-item">
+                <div class="promo-icon blue-bg">🍜</div>
+                <div class="promo-info">
+                  <h4>Senin Hemat</h4>
+                  <p>Mie Ayam cuma Rp7.000</p>
+                </div>
+                <span class="promo-badge blue-badge">SENIN</span>
+              </div>
+
+              <div class="promo-item">
+                <div class="promo-icon yellow-bg">🍳</div>
+                <div class="promo-info">
+                  <h4>Paket Sarapan</h4>
+                  <p>Nasi Uduk + Es Teh Rp9.000</p>
+                </div>
+                <span class="promo-badge yellow-badge">SETIAP HARI</span>
+              </div>
+
+              <div class="promo-item">
+                <div class="promo-icon cyan-bg">🍌</div>
+                <div class="promo-info">
+                  <h4>Menu Baru</h4>
+                  <p>Pisang Goreng Coklat</p>
+                </div>
+                <span class="promo-badge cyan-badge">MINGGU INI</span>
+              </div>
+
+              <div class="promo-item">
+                <div class="promo-icon red-bg">💧</div>
+                <div class="promo-info">
+                  <h4>Jumat Berkah</h4>
+                  <p>Air mineral gratis tiap beli makanan</p>
+                </div>
+                <span class="promo-badge red-badge">JUMAT</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ==================== HALAMAN 2: PRODUK ==================== -->
+      <div id="page-produk" class="page-section">
+        <header class="top-header">
+          <div>
+            <span class="breadcrumb">Kantin HSI-BS / Produk</span>
+            <h1>Kelola Produk</h1>
+            <p class="subtitle">Tambah atau hapus daftar menu kantin</p>
+          </div>
+        </header>
+
+        <div class="card" style="margin-bottom: 20px;">
+          <h3 style="margin-bottom: 12px;">Tambah Produk Baru</h3>
+          <form id="add-product-form" class="form-inline">
+            <input type="text" id="new-name" placeholder="Nama produk (misal: Bakso)" required />
+            <select id="new-category">
+              <option value="MAKANAN">Makanan</option>
+              <option value="MINUMAN">Minuman</option>
+              <option value="SNACK">Snack</option>
+            </select>
+            <input type="number" id="new-sold" placeholder="Jumlah terjual" required min="1" />
+            <input type="number" id="new-revenue" placeholder="Total omzet (Rp)" required min="1000" />
+            <button type="submit" class="btn-primary">+ Tambah</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>Semua Daftar Produk</h3>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Nama Produk</th>
+                <th>Kategori</th>
+                <th>Terjual</th>
+                <th>Omzet</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="manage-product-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ==================== HALAMAN 3: LAPORAN ==================== -->
+      <div id="page-laporan" class="page-section">
+        <header class="top-header">
+          <div>
+            <span class="breadcrumb">Kantin HSI-BS / Laporan</span>
+            <h1>Laporan Penjualan</h1>
+            <p class="subtitle">Ringkasan transaksi mingguan Kantin HSI-BS</p>
+          </div>
+          <button onclick="window.print()" class="btn-primary">🖨️ Cetak Laporan</button>
+        </header>
+
+        <div class="card">
+          <h3 style="margin-bottom: 14px;">Rekap Harian (17 Okt – 23 Okt 2026)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Hari / Tanggal</th>
+                <th>Jumlah Transaksi</th>
+                <th>Item Terjual</th>
+                <th>Total Omzet</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Sabtu, 17 Okt</td><td>4</td><td>41</td><td>Rp220.000</td></tr>
+              <tr><td>Minggu, 18 Okt</td><td>2</td><td>30</td><td>Rp165.000</td></tr>
+              <tr><td>Senin, 19 Okt</td><td>3</td><td>36</td><td>Rp198.000</td></tr>
+              <tr><td>Selasa, 20 Okt</td><td>3</td><td>40</td><td>Rp220.000</td></tr>
+              <tr><td>Rabu, 21 Okt</td><td>3</td><td>35</td><td>Rp195.000</td></tr>
+              <tr><td>Kamis, 22 Okt</td><td>2</td><td>28</td><td>Rp154.000</td></tr>
+              <tr><td>Jumat, 23 Okt</td><td>4</td><td>51</td><td>Rp258.000</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ==================== HALAMAN 4: PENGATURAN ==================== -->
+      <div id="page-pengaturan" class="page-section">
+        <header class="top-header">
+          <div>
+            <span class="breadcrumb">Kantin HSI-BS / Pengaturan</span>
+            <h1>Pengaturan Kantin</h1>
+            <p class="subtitle">Konfigurasi identitas dan preferensi sistem</p>
+          </div>
+        </header>
+
+        <div class="card" style="max-width: 500px;">
+          <form id="settings-form" class="settings-stack">
+            <div class="form-group">
+              <label>Nama Kantin</label>
+              <input type="text" id="setting-name" value="Kantin HSI-BS" />
+            </div>
+            <div class="form-group">
+              <label>Sub-judul / Institusi</label>
+              <input type="text" id="setting-sub" value="HSI Boarding School" />
+            </div>
+            <button type="submit" class="btn-primary">Simpan Perubahan</button>
+            <p id="settings-msg" style="color: #15803d; font-size: 12px; display: none;">✅ Pengaturan berhasil disimpan!</p>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
